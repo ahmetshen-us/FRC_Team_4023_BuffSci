@@ -26,9 +26,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  */
 public class Robot extends IterativeRobot {
 	RobotDrive myRobot = new RobotDrive(0, 1);
-	Joystick stick = new Joystick(0);
-	// Joystick secondstick = new Joystick(1);
-	SpeedController armmotor = new Talon(5);
+	Joystick stick0 = new Joystick(2);
+	Joystick stick1 = new Joystick(3);
+	SpeedController ropeClimber = new Talon(4);
 	Thread visionThread;
 
 	Timer timer = new Timer();
@@ -128,24 +128,28 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during autonomous
 	 */
 
+	double driveSpeed = -(0.3);
+
 	@Override
 	public void autonomousPeriodic() {
-		double driveSpeed = -(0.4);
 		double timerSecondsPassed = timer.get();
 
-		double driveForXSecondsFirstPhase = 2.0;
-		double driveForXSecondsSecondPhase = 0.0;
+		double driveForXSecondsFirstPhase = 4.0;
+		double driveForXSecondsSecondPhase = 2.0;
 		// set curveAmount to 0.0 to got straight left is > 0 and right is < 0
 		double curveAmountFirstPhase = 0.0;
 		double curveAmountSecondPhase = 0.0;
 
-		if (timerSecondsPassed < driveForXSecondsFirstPhase) {
+		if (timerSecondsPassed <= driveForXSecondsFirstPhase) {
 			myRobot.drive(driveSpeed, curveAmountFirstPhase);
 		}
 
 		else if (timerSecondsPassed < (driveForXSecondsFirstPhase
 				+ driveForXSecondsSecondPhase)) {
+			// slow the robot down
+			driveSpeed = driveSpeed + 0.1;
 			myRobot.drive(driveSpeed, curveAmountSecondPhase);
+
 		}
 
 		else {
@@ -166,11 +170,18 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		double xaxisToRotate = -stick.getX();// rotateValue
-		double yaxisToMove = stick.getY(); // moveValue
+		double xaxisToRotate = -stick0.getX();// rotateValue
+		double yaxisToMove = stick0.getY(); // moveValue
 
 		myRobot.arcadeDrive(yaxisToMove, xaxisToRotate);
 
+		if (stick0.getRawButton(1)) {
+			ropeClimber.set(1.0);
+		} else {
+			ropeClimber.set(0.0);
+		}
+
+		// myRobot.tankDrive(stick0.getAxis(AxisType.kY),stick1.getAxis(AxisType.kY));
 		// armmotor.set(secondstick.getY());
 
 	}
