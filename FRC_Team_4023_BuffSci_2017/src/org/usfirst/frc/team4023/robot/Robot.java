@@ -25,12 +25,11 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	RobotDrive myRobot = new RobotDrive(0, 1);
-	Joystick stick0 = new Joystick(2);
-	Joystick stick1 = new Joystick(3);
+	RobotDrive myRobot = new RobotDrive(2, 3);
+	Joystick stick0 = new Joystick(0);
+	// Joystick stick1 = new Joystick(1);
 	SpeedController ropeClimber = new Talon(4);
 	Thread visionThread;
-
 	Timer timer = new Timer();
 
 	/**
@@ -129,28 +128,34 @@ public class Robot extends IterativeRobot {
 	 */
 
 	double driveSpeed = -(0.3);
+	private double timerSecondsPassed;
+	private double driveForXSecondsFirstPhase = 4.0;
+	// private double driveForXSecondsSecondPhase = 2.0;
+
+	// set curveAmount to 0.0 to got straight left is > 0 and right is < 0
+	private double curveAmountFirstPhase = 0.0;
+	// private double curveAmountSecondPhase = 0.0;
+	//
+	// private double actualdriveForXSecondsSecondPhase =
+	// driveForXSecondsFirstPhase
+	// + driveForXSecondsSecondPhase;
 
 	@Override
 	public void autonomousPeriodic() {
-		double timerSecondsPassed = timer.get();
+		timerSecondsPassed = timer.get();
 
-		double driveForXSecondsFirstPhase = 4.0;
-		double driveForXSecondsSecondPhase = 2.0;
-		// set curveAmount to 0.0 to got straight left is > 0 and right is < 0
-		double curveAmountFirstPhase = 0.0;
-		double curveAmountSecondPhase = 0.0;
+		System.out.println("timerSecondsPassed => " + timerSecondsPassed);
 
 		if (timerSecondsPassed <= driveForXSecondsFirstPhase) {
 			myRobot.drive(driveSpeed, curveAmountFirstPhase);
-		}
+		} //
 
-		else if (timerSecondsPassed < (driveForXSecondsFirstPhase
-				+ driveForXSecondsSecondPhase)) {
-			// slow the robot down
-			driveSpeed = driveSpeed + 0.1;
-			myRobot.drive(driveSpeed, curveAmountSecondPhase);
-
-		}
+		// else if (timerSecondsPassed < actualdriveForXSecondsSecondPhase) {
+		// // slow the robot down
+		// driveSpeed = driveSpeed + 0.1;
+		// myRobot.drive(driveSpeed, curveAmountSecondPhase);
+		//
+		// }
 
 		else {
 			myRobot.drive(0.0, 0.0); // stop robot
@@ -161,22 +166,33 @@ public class Robot extends IterativeRobot {
 	 * This function is called once each time the robot enters tele-operated
 	 * mode
 	 */
+
 	@Override
 	public void teleopInit() {
+
 	}
 
 	/**
 	 * This function is called periodically during operator control
 	 */
+	private double xaxisToRotate;
+	private double yaxisToMove;
+
 	@Override
 	public void teleopPeriodic() {
-		double xaxisToRotate = -stick0.getX();// rotateValue
-		double yaxisToMove = stick0.getY(); // moveValue
+		yaxisToMove = stick0.getY(); // move Value
+		xaxisToRotate = -stick0.getX(); // rotate Value
 
 		myRobot.arcadeDrive(yaxisToMove, xaxisToRotate);
 
 		if (stick0.getRawButton(1)) {
-			ropeClimber.set(1.0);
+			ropeClimber.set(-1.0);
+		} else {
+			ropeClimber.set(0.0);
+		}
+
+		if (stick0.getRawButton(2)) {
+			ropeClimber.set(0.5);
 		} else {
 			ropeClimber.set(0.0);
 		}
