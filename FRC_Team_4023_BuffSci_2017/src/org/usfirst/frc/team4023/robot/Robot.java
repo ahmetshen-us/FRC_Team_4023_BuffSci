@@ -134,10 +134,10 @@ public class Robot extends IterativeRobot {
 		double timerSecondsPassed = timer.get();
 
 		double driveForXSecondsFirstPhase = 2.0;
-		double driveForXSecondsSecondPhase = 2.0;
+		double driveForXSecondsSecondPhase = 0.0;
 		// set curveAmount to 0.0 to got straight left is > 0 and right is < 0
-		double curveAmountFirstPhase = 0.3;
-		double curveAmountSecondPhase = -0.3;
+		double curveAmountFirstPhase = 0.0;
+		double curveAmountSecondPhase = 0.0;
 
 		if (timerSecondsPassed < driveForXSecondsFirstPhase) {
 			myRobot.drive(driveSpeed, curveAmountFirstPhase);
