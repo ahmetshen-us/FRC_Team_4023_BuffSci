@@ -36,10 +36,14 @@ public class Robot extends IterativeRobot {
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
+
 	@Override
 	public void robotInit() {
-		// CameraServer.getInstance().startAutomaticCapture();
+		advancedCameraServerBlurred();
+		axisCameraVisionThread();
+	}
 
+	private void advancedCameraServerBlurred() {
 		// Advanced camera server program
 		// In the following example a thread created in robotInit() gets the
 		// Camera Server instance. ¬†Each frame of the video is individually
@@ -51,32 +55,34 @@ public class Robot extends IterativeRobot {
 		// OpenCV methods to write targeting information onto the image being
 		// sent to the dashboard.
 
-		// new Thread(() -> {
-		// UsbCamera camera = CameraServer.getInstance()
-		// .startAutomaticCapture();
-		// camera.setResolution(640, 480);
-		//
-		// CvSink cvSink = CameraServer.getInstance().getVideo();
-		// CvSource outputStream = CameraServer.getInstance().putVideo("Blur",
-		// 640, 480);
-		//
-		// Mat source = new Mat();
-		// Mat output = new Mat();
-		//
-		// while (!Thread.interrupted()) {
-		// cvSink.grabFrame(source);
-		// Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
-		// outputStream.putFrame(output);
-		// }
-		// }).start();
+		new Thread(() -> {
 
-		// CameraServer server = CameraServer.getInstance();
-		// server.startAutomaticCapture("cam0", 0);
-		// CameraServer server1 = CameraServer.getInstance();
-		// server1.startAutomaticCapture("cam1", 1);
+			// UsbCamera camera = CameraServer.getInstance()
+			// .startAutomaticCapture();
+			AxisCamera camera = CameraServer.getInstance()
+					.addAxisCamera("axis-camera.local");
 
+			camera.setResolution(640, 480);
+
+			CvSink cvSink = CameraServer.getInstance().getVideo();
+			CvSource outputStream = CameraServer.getInstance().putVideo("Blur",
+					640, 480);
+
+			Mat source = new Mat();
+			Mat output = new Mat();
+
+			while (!Thread.interrupted()) {
+				cvSink.grabFrame(source);
+				Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
+				outputStream.putFrame(output);
+			}
+		}).start();
+	}
+
+	private void axisCameraVisionThread() {
 		visionThread = new Thread(() -> {
 			// Get the Axis camera from CameraServer
+
 			AxisCamera camera = CameraServer.getInstance()
 					.addAxisCamera("axis-camera.local");
 			// Set the resolution
